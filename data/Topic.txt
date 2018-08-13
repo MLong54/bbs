@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "views": 15,
+    "title": "333333333333",
+    "content": "1111111111111",
+    "ct": 1524832020,
+    "ut": 1524832020,
+    "user_id": 1,
+    "board_id": 2
+  },
+  {
+    "id": 2,
+    "views": 1,
+    "title": "333333333333",
+    "content": "1111111111111",
+    "ct": 1524832085,
+    "ut": 1524832085,
+    "user_id": 1,
+    "board_id": 2
+  },
+  {
+    "id": 3,
+    "views": 3,
+    "title": "aaaaaaaaaaaaaaaa",
+    "content": "aaaaaaaaaa",
+    "ct": 1524838820,
+    "ut": 1524838820,
+    "user_id": 1,
+    "board_id": 3
+  },
+  {
+    "id": 4,
+    "views": 0,
+    "title": "sssssssssssssss",
+    "content": "ssssssssssssssssssssssss",
+    "ct": 1524839096,
+    "ut": 1524839096,
+    "user_id": 1,
+    "board_id": 3
+  }
+]

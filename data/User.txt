@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "username": "gua",
+    "password": "1be6af03717a0906a774a129ac467fcea8f89849df003548a8039cffffb12baf",
+    "image": "/images/3.jpg"
+  },
+  {
+    "id": 2,
+    "username": "guagua",
+    "password": "1be6af03717a0906a774a129ac467fcea8f89849df003548a8039cffffb12baf",
+    "image": ""
+  }
+]
