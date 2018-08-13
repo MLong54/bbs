@@ -1,0 +1,6 @@
+.idea
+config.py
+gua.log.txt
+*.pyc
+secret.py
+database_secret.conf
