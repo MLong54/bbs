@@ -1,0 +1,131 @@
+
+{% extends "base.html" %}
+{% block title %}设置主页{% endblock%}
+{% block main %}
+<div id="content">
+  <div class="panel">
+    <div class="header">
+      <ul class="breadcrumb">
+        <li><a href="/">主页</a><span class="divider">/</span></li>
+      </ul>
+    </div>
+    <div class="inner userinfo">
+      <div class="user_big_avatar">
+        <img src="{{ user.image }}" class="user_avatar" title="{{ user.username }}">
+      </div>
+      <a class="dark">{{ user.username }}</a>
+        <div>
+          <span class="signature">
+            “{{ user.signature }}”
+          </span>
+        </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="header">
+      <span class="col_fade">最近创建的话题</span>
+    </div>
+
+      {% for t in ts %}
+        <div class="cell">
+            <a class="user_avatar pull-left" href="/user/{{ user.username }}">
+                 <img src="{{ user.image }}" title="{{ user.username }}">
+            </a>
+            <div class="topic_title_wrapper">
+                <span>{{ t.replies() | count }} / {{ t.views }}</span>
+                <a class="topic_title" href="{{ url_for('topic.detail', id=t.id) }}">
+                    {{ t.title }}
+                </a>
+                <a class="last_time pull-right" href="/topic/{{ t.id }}">
+                    <img class="user_small_avatar" src="{{t.user().image}}">
+                    <span class="last_active_time" data-created_time="{{ t.created_time }}"></span>
+                </a>
+
+            </div>
+        </div>
+       {% endfor %}
+  </div>
+
+  <div class="panel">
+        <div class="header">
+          <span class="col_fade">最近参与的话题</span>
+        </div>
+        {% for t in tes %}
+        <div class="cell">
+        <a class="user_avatar pull-left" href="/user/{{ user.username }}">
+             <img src="{{ user.image }}" title="{{ user.username }}">
+        </a>
+            <div class="topic_title_wrapper">
+                <span>{{ t.replies() | count }} / {{ t.views }}</span>
+                <a class="topic_title" href="{{ url_for('topic.detail', id=t.id) }}">
+                    {{ t.title }}
+                </a>
+
+              <a class="last_time pull-right" href="/topic/{{ t.id }}">
+                <img class="user_small_avatar" src="{{t.user().image}}">
+                <span class="last_active_time" data-created_time="{{ t.created_time }}"></span>
+              </a>
+            </div>
+        </div>
+       {% endfor %}
+</div>
+</div>
+</div>
+
+<script src="https://cdn.bootcss.com/marked/0.3.19/marked.min.js"></script>
+<script src="https://cdn.bootcss.com/prism/1.13.0/prism.js"></script>
+<script src="https://cdn.bootcss.com/prism/1.13.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+    var e = function (sel) {
+        return document.querySelector(sel)
+    }
+
+    var es = function (sel) {
+        return document.querySelectorAll(sel)
+    }
+
+    var markContents = function () {
+        // markdown -> html 的处理放在高亮前面
+        // 因为高亮是针对 html 格式的
+        // lang -> language 不需要转 prism 自动转了
+        var contentDivs = es('.markdown-text')
+        for (var i = 0; i < contentDivs.length; i++) {
+            var contentDiv = contentDivs[i]
+            console.log('pre marked', contentDiv.textContent, contentDiv.innerHTML)
+            var content = marked(contentDiv.textContent)
+            console.log('after marked', content)
+            contentDiv.innerHTML = content
+        }
+    }
+
+    var highlight = function() {
+         // 自动加载对应的语言 不然要手动加入各个语言的 js
+        Prism.plugins.autoloader.languages_path = 'https://cdn.bootcss.com/prism/1.13.0/components/'
+    }
+
+    var registerTimer = function () {
+        setInterval(function () {
+            var times = es('.last_active_time')
+            for (var i = 0; i < times.length; i++) {
+                var t = times[i]
+                var time = Number(t.dataset.created_time)
+                var now = Math.floor(new Date() / 1000)
+                var delta = ((now - time) / 3600).toFixed(2)
+                var s = `${delta} 小时前`
+                t.innerText = s
+            }
+        }, 1000)
+    }
+
+    var __main = function () {
+        markContents()
+        highlight()
+        registerTimer()
+    }
+
+    __main()
+
+</script>
+
+{% endblock %}

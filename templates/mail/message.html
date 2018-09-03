@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}邮件详情页{% endblock%}
+{% block main %}
+
+  <div class="panel">
+    <div class="header">
+      <span class="col_fade">收到的私信</span>
+        {% for s in send %}
+            <div class="cell">
+                <a href="{{ url_for('mail.view', id = s.id) }}"> {{ s.title }}</a>
+                <span class="last_time pull-right">
+                    <span class="last_active_time" data-created_time="{{ s.created_time }}"></span>
+                </span>
+            </div>
+        {% endfor %}
+
+    </div>
+  </div>
+
+  <div class="panel">
+        <div class="header">
+          <span class="col_fade">发送的私信</span>
+            <div class="cell">
+               {% for r in received %}
+                    <div>
+                        <a href="{{ url_for('mail.view', id = r.id) }}"> {{ r.title }}</a>
+                    </div>
+                     <div class="topic_title_wrapper">
+                        <span class="last_active_time" data-created_time="{{ r.created_time }}"></span>
+                     </div>
+                {% endfor %}
+            </div>
+
+        </div>
+  </div>
+
+
+<script src="https://cdn.bootcss.com/marked/0.3.19/marked.min.js"></script>
+<script src="https://cdn.bootcss.com/prism/1.13.0/prism.js"></script>
+<script src="https://cdn.bootcss.com/prism/1.13.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+    var e = function (sel) {
+        return document.querySelector(sel)
+    }
+
+    var es = function (sel) {
+        return document.querySelectorAll(sel)
+    }
+
+    var registerTimer = function () {
+        setInterval(function () {
+            var times = es('.last_active_time')
+            for (var i = 0; i < times.length; i++) {
+                var t = times[i]
+                var time = Number(t.dataset.created_time)
+                var now = Math.floor(new Date() / 1000)
+                var delta = ((now - time) / 3600).toFixed(2)
+                var s = `${delta} 小时前`
+                t.innerText = s
+            }
+        }, 1000)
+    }
+
+    var __main = function () {
+        registerTimer()
+    }
+
+    __main()
+
+</script>
+{% endblock %}

@@ -14,22 +14,28 @@ def reset_database():
     e = create_engine(url, echo=True)
 
     with e.connect() as c:
-        c.execute('DROP DATABASE IF EXISTS web21')
-        c.execute('CREATE DATABASE web21 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci')
-        c.execute('USE web21')
+        c.execute('DROP DATABASE IF EXISTS flask_bbs')
+        c.execute('CREATE DATABASE flask_bbs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci')
+        c.execute('USE flask_bbs')
 
     db.metadata.create_all(bind=e)
 
 
 def generate_fake_date():
     form = dict(
-        username='gua',
-        password='123',
+        username = 'mlong',
+        password = '123',
     )
+    guest = dict(
+        username = 'guest',
+        password = 'guest',
+        signature = '喜欢的话，就注册账号来玩吧',
+    )
+    User.register(guest)
     u = User.register(form)
 
     form = dict(
-        title='all'
+        title='Python'
     )
     b = Board.new(form)
     with open('markdown_demo.md', encoding='utf8') as f:
@@ -40,16 +46,16 @@ def generate_fake_date():
         content=content
     )
 
-    for i in range(100):
-        print('begin topic <{}>'.format(i))
-        t = Topic.new(topic_form, u.id)
+    # for i in range(100):
+    # print('begin topic <{}>'.format())
+    t = Topic.new(topic_form, u.id)
 
-        reply_form = dict(
-            content='reply test',
-            topic_id=t.id,
-        )
-        for j in range(10):
-            Reply.new(reply_form, u.id)
+    reply_form = dict(
+        content='reply test',
+        topic_id=t.id,
+    )
+    for j in range(2):
+        Reply.new(reply_form, u.id)
 
 
 if __name__ == '__main__':

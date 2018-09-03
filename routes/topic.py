@@ -7,7 +7,7 @@ from flask import (
 )
 
 from routes import *
-
+from utils import *
 from models.topic import Topic
 from models.board import Board
 
@@ -21,16 +21,21 @@ def index():
         ms = Topic.all()
     else:
         ms = Topic.all(board_id=board_id)
-    token = new_csrf_token()
     bs = Board.all()
-    return render_template("topic/index.html", ms=ms, token=token, bs=bs, bid=board_id)
+    u = current_user()
+    if u is None:
+        u = User.one(username='guest')
+        u.username = '游客'
+    format_ts = format_time(ms)
+    return render_template("topic/index.html", ms=ms, ct=format_ts, u=u, bs=bs, bid=board_id)
 
 
 @main.route('/<int:id>')
 def detail(id):
     m = Topic.get(id)
+    t = format_time(m)
     # 传递 topic 的所有 reply 到 页面中
-    return render_template("topic/detail.html", topic=m)
+    return render_template("topic/detail.html", topic=m, t=t)
 
 
 @main.route("/delete")
@@ -49,13 +54,14 @@ def new():
     bs = Board.all()
     # return render_template("topic/new.html", bs=bs, bid=board_id)
     token = new_csrf_token()
+    log('topic token:', token)
     return render_template("topic/new.html", bs=bs, token=token, bid=board_id)
 
 
 @main.route("/add", methods=["POST"])
 @csrf_required
 def add():
-    form = request.form
+    form = request.form.to_dict()
     u = current_user()
     Topic.new(form, user_id=u.id)
     return redirect(url_for('.index'))

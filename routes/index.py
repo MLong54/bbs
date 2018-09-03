@@ -1,4 +1,4 @@
-import os
+import os, sys
 import uuid
 
 from flask import (
@@ -42,30 +42,48 @@ main = Blueprint('index', __name__)
 @main.route("/")
 def index():
     u = current_user()
-    return render_template("index.html", user=u)
+    return redirect(url_for('topic.index'))
 
 
-@main.route("/register", methods=['POST'])
+@main.route("/register", methods=['GET', 'POST'])
 def register():
-    form = request.form.to_dict()
-    # 用类函数来判断
-    u = User.register(form)
-    return redirect(url_for('.index'))
+    m = request.method
+    if 'GET' == m:
+        return render_template("register.html")
+    elif 'POST' == m:
+        form = request.form.to_dict()
+        # 用类函数来判断
+        u = User.register(form)
+        return redirect(url_for('.login'))
 
 
-@main.route("/login", methods=['POST'])
+@main.route("/login", methods=['GET', 'POST'])
 def login():
-    form = request.form
-    u = User.validate_login(form)
-    if u is None:
-        return redirect(url_for('.index'))
-    else:
-        # session 中写入 user_id
-        session['user_id'] = u.id
-        # 设置 cookie 有效期为 永久
-        session.permanent = True
-        # 转到 topic.index 页面
-        return redirect(url_for('topic.index'))
+    m = request.method
+    if 'GET' == m:
+        return render_template('login.html')
+    elif 'POST' == m:
+        form = request.form
+        u = User.validate_login(form)
+        if u is None:
+            return redirect(url_for('.index'))
+        else:
+            # session 中写入 user_id
+            session['user_id'] = u.id
+            # 设置 cookie 有效期为 永久
+            session.permanent = True
+            # 转到 topic.index 页面
+            return redirect(url_for('topic.index'))
+
+
+@main.route("/api")
+def api():
+    return render_template("api.html")
+
+
+@main.route("/about")
+def about():
+    return render_template("abort.html")
 
 
 def created_topic(user_id):
@@ -115,16 +133,9 @@ def replied_topic(user_id):
 def profile():
     u = current_user()
     if u is None:
-        return redirect(url_for('.index'))
+        return redirect(url_for('topic.index'))
     else:
-        created = created_topic(u.id)
-        replied = replied_topic(u.id)
-        return render_template(
-            'profile.html',
-            user=u,
-            created=created,
-            replied=replied
-        )
+        return render_template('profile.html', user=u)
 
 
 @main.route('/user/<int:id>')
@@ -143,14 +154,18 @@ def avatar_add():
     # ../../root/.ssh/authorized_keys
     # filename = secure_filename(file.filename)
     suffix = file.filename.split('.')[-1]
-    filename = '{}.{}'.format(str(uuid.uuid4()), suffix)
-    path = os.path.join('images', filename)
+    file.filename = '{}.{}'.format(str(uuid.uuid4()), suffix)
+    #因为相对路径不能用，所以暂时使用绝对路径
+    path = os.path.join(sys.path[0] + '/images', file.filename)
+    # path = os.path.join('images/', file.filename)
+
+    print('save fuck images  filename:<{}> , path:<{}>'.format(file.filename, path))
     file.save(path)
 
     u = current_user()
-    User.update(u.id, image='/images/{}'.format(filename))
+    User.update(u.id, image='/images/{}'.format(file.filename))
 
-    return redirect(url_for('.profile'))
+    return redirect(url_for('.setting'))
 
 
 @main.route('/images/<filename>')
@@ -158,3 +173,43 @@ def image(filename):
     # 不要直接拼接路由，不安全，比如
     # open(os.path.join('images', filename), 'rb').read()
     return send_from_directory('images', filename)
+
+
+@main.route('/setting', methods=['POST', 'GET'])
+def setting():
+    u = current_user()
+
+    return render_template('setting.html', u=u)
+
+
+@main.route('/setting/update_user', methods=['POST'])
+def update_user():
+    u = current_user()
+    form:dict = request.form.to_dict()
+
+    old_pass = form.get('old_pass', None)
+    if old_pass is not None and User.salted_password(old_pass) != u.password:
+        print('原始密码不对')
+        return render_template('setting.html', u=u)
+    elif old_pass is not None and User.salted_password(old_pass) == u.password:
+        form['password'] = User.salted_password(form['new_pass'])
+
+    print('setting form <{}>'.format(form))
+    u = User.update(u.id, **form)
+    print('update u {}'.format(u))
+    return redirect(url_for('.setting'))
+
+
+@main.route('/user/<name>')
+def userinfo(name):
+    u = User.one(username=name)
+    #找到自己创建的topic
+    ts = Topic.all(user_id=u.id)
+
+    #参与过的
+    rs = Reply.all(user_id=u.id)
+    tes = []
+    for r in rs:
+        tes.append(Topic.one(id=r.topic_id))
+
+    return render_template('userinfo.html', ts=ts, tes=tes, user=u)

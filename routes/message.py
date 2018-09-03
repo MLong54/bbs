@@ -36,6 +36,22 @@ def add():
     return redirect(url_for('.index'))
 
 
+@main.route('/message')
+def message():
+    u = current_user()
+    if u is None:
+        return redirect(url_for('topic.index'))
+    else:
+        sent_mail = Messages.all(sender_id=u.id)
+        received_mail = Messages.all(receiver_id=u.id)
+        print('send:', sent_mail)
+        return render_template(
+            'mail/message.html',
+            send=sent_mail,
+            received=received_mail,
+        )
+
+
 @main.route('/')
 def index():
     u = current_user()
@@ -57,6 +73,8 @@ def view(id):
     u = current_user()
     # if u.id == mail.receiver_id or u.id == mail.sender_id:
     if u.id in [mail.receiver_id, mail.sender_id]:
-        return render_template('mail/detail.html', mail=mail)
+        send_name = User.one(id=mail.sender_id).username
+        recev_name = User.one(id=mail.receiver_id).username
+        return render_template('mail/detail.html', mail=mail, sname=send_name, rname=recev_name)
     else:
         return redirect(url_for('.index'))

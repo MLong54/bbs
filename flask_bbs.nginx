@@ -1,0 +1,15 @@
+server {
+    listen 80;
+
+    location /images {
+        alias /var/www/flask_bbs/images;
+    }
+
+    location /static {
+        alias /var/www/flask_bbs/static;
+    }
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}

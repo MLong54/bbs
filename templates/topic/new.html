@@ -1,25 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>bbs club</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/lib/editor/editor.css">
-    <link rel="stylesheet" href="/static/lib/webuploader/webuploader.css">
-    <script src="/static/lib/jquery-3.0.0.min.js"></script>
-    <script src="/static/lib/markdownit.js"></script>
-    <script src="/static/lib/webuploader/webuploader.withoutimage.js"></script>
-    <script src="/static/lib/editor/editor.js"></script>
-    <script src="/static/lib/editor/ext.js"></script>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Abort{% endblock%}
+{% block main %}
+
     <div id="main">
         <div id="content">
             <div class="panel">
                 <div class="inner post">
 <form id="create_topic_form" method="post" action="{{ url_for('.add', token=token) }}">
-<!--<form id="create_topic_form" method="post" action="{{ url_for('.add') }}">-->
     <fieldset>
         <textarea autofocus class='span9' id='title'
                   name='title' rows='1'
@@ -54,5 +41,4 @@
     editor.render($('.editor')[0]);
   })();
 </script>
-</body>
-</html>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "topic/base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ topic.title }}{% endblock%}
 {% block main %}
 <div id="main">
@@ -10,7 +10,7 @@
       	</span>
                 <div class="changes">
             <span>
-                发布于 2 天前
+                发布于 {{ t[topic.id]['ct'] }}
             </span>
                     <span>
                 {% set u = topic.user() %}
@@ -20,7 +20,7 @@
           	    {{ topic.views }} 次浏览
         	</span>
                     <span>
-                来自 问答
+                最后一次修改 {{ t[topic.id]['ut'] }}
             </span>
                 </div>
             </div>
