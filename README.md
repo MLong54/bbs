@@ -8,5 +8,9 @@
 
 ----
 
-项目展示：
+### 项目地址：
+http://58.87.106.60/topic/
+
+
+### 项目展示：
 ![image](https://github.com/MLong54/flask_bbs/blob/master/images/flask_bbs.gif)
